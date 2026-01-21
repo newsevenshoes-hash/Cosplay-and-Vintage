@@ -80,23 +80,24 @@
                 },
 
                 parseCSV(csv) {
-                    const righe = csv.split(/\r?\n/).filter(r => r.trim() !== "");
-                    return righe.slice(1).map((riga, i) => {
-                        // Rileva se il foglio usa , o ;
-                        const sep = riga.includes(';') ? ';' : ',';
-                        const d = riga.split(sep).map(s => s.replace(/"/g, '').trim());
-                        
-                        return {
-                            id: i,
-                            nome: d[1] || 'Senza Nome',
-                            categoria: d[2] || '',
-                            prezzo: d[3] || '0',
-                            foto: d[4] || '',
-                            descrizione: d[5] || '',
-                            tagliaScelta: ''
-                        };
-                    });
-                },
+    const righe = csv.split(/\r?\n/).filter(r => r.trim() !== "");
+    return righe.slice(1).map((riga, i) => {
+        const sep = riga.includes(';') ? ';' : ',';
+        const d = riga.split(sep).map(s => s.replace(/"/g, '').trim());
+        
+        return {
+            id: i,
+            nome: d[1] || 'Senza Nome',
+            categoria: d[2] || '',
+            prezzo: d[3] || '0',
+            foto: d[4] || '',
+            descrizione: d[5] || '',
+            // Legge la nuova colonna G (indice 6)
+            giacenza: d[6] ? d[6].split(',').map(t => t.trim()) : null,
+            tagliaScelta: ''
+        };
+    });
+},
 
                 getOpzioni(cat) {
                     return (cat && cat.toLowerCase().includes('scarp')) ? this.numeriScarpe : this.taglieAbiti;
@@ -113,3 +114,4 @@
     </script>
 </body>
 </html>
+
