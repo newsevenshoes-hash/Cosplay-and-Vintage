@@ -49,15 +49,19 @@
         prodotti: [],
         taglieAbiti: ['S', 'M', 'L', 'XL', 'XXL'],
         numeriScarpe: ['35', '36', '37', '38', '39', '40', '41'],
-        https://docs.google.com/spreadsheets/d/e/2PACX-1vTjQSVDQ_dhu0su7gfiv8uoJR99o9h_kfYk_fiKZvO4WKPd21paU5QXI_HMCB2U2VB575qQww4CwxYI/pub?output=csv
-        urlFoglio: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTjQSVDQ_dhu0su7gfiv8uoJR99o9h_kfYk_fiKZvO4WKPd21paU5QXI_HMCB2U2VB575qQww4CwxYI/pub?gid=0&single=true&output=csv&cachebuster=" + new Date().getTime(),
+        urlFoglio: "IL_TUO_LINK_CSV_QUI",
 
         async init() {
-            const response = await fetch(this.urlFoglio);
-            const data = await response.text();
-            this.prodotti = this.parseCSV(data);
+            try {
+                const response = await fetch(this.urlFoglio);
+                const data = await response.text();
+                this.prodotti = this.parseCSV(data);
+                console.log("Prodotti caricati:", this.prodotti);
+            } catch (error) {
+                console.error("Errore nel caricamento:", error);
+            }
         },
-
+        
         parseCSV(csv) {
     // Divide le righe e toglie quella dell'intestazione
     const righe = csv.split(/\r?\n/).slice(1); 
@@ -99,4 +103,5 @@
 </body>
 
 </html>
+
 
