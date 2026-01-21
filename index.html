@@ -116,7 +116,7 @@
 
                 mandaOrdine(p) {
                     if (!p.tagliaScelta) return alert("Seleziona la taglia!");
-                    const tel = "39XXXXXXXXXX"; // <--- METTI IL TUO NUMERO
+                    const tel = "393715475485"; // <--- METTI IL TUO NUMERO
                     const msg = `Ciao! Vorrei ordinare:\n\n*${p.nome}*\nTaglia: ${p.tagliaScelta}\nPrezzo: €${p.prezzo}`;
                     window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`);
                 }
@@ -125,4 +125,5 @@
     </script>
 </body>
 </html>
+
 
