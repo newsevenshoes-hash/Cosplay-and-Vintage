@@ -76,21 +76,25 @@
                 },
 
                 parseCSV(csv) {
-                    const righe = csv.split(/\r?\n/).filter(r => r.trim() !== "");
-                    const dati = righe.slice(1);
-                    return dati.map((riga, index) => {
-                        const d = riga.split(/[;,]/); // Gestisce sia virgola che punto e virgola
-                        return {
-                            id: index,
-                            nome: d[1] ? d[1].replace(/"/g, '').trim() : 'Prodotto',
-                            categoria: d[2] ? d[2].replace(/"/g, '').trim() : 'Varie',
-                            prezzo: d[3] ? d[3].replace(/"/g, '').trim() : '0',
-                            foto: d[4] ? d[4].replace(/"/g, '').trim() : '',
-                            descrizione: d[5] ? d[5].replace(/"/g, '').trim() : '',
-                            tagliaScelta: ''
-                        };
-                    });
-                },
+    const righe = csv.split(/\r?\n/).filter(r => r.trim() !== "");
+    const dati = righe.slice(1);
+    return dati.map((riga, index) => {
+        const d = riga.split(/[;,]/); 
+        
+        // Pulizia del link foto: rimuove spazi e virgolette
+        let linkFoto = d[4] ? d[4].replace(/"/g, '').trim() : '';
+        
+        return {
+            id: index,
+            nome: d[1] ? d[1].replace(/"/g, '').trim() : 'Prodotto',
+            categoria: d[2] ? d[2].replace(/"/g, '').trim() : 'Abbigliamento',
+            prezzo: d[3] ? d[3].replace(/"/g, '').trim() : '0',
+            foto: linkFoto,
+            descrizione: d[5] ? d[5].replace(/"/g, '').trim() : '',
+            tagliaScelta: ''
+        };
+    });
+},
 
                 getOpzioni(cat) {
     if (!cat) return this.taglieAbiti;
@@ -122,6 +126,7 @@
     </script>
 </body>
 </html>
+
 
 
 
