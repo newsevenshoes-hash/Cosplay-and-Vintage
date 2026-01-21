@@ -104,22 +104,33 @@
                 },
 
                 getOpzioni(cat) {
-                    if(!cat) return this.taglieAbiti;
-                    const c = cat.toLowerCase();
-                    return (c.includes('scarpa') || c.includes('num')) ? this.numeriScarpe : this.taglieAbiti;
-                },
+    if (!cat) return this.taglieAbiti;
+    const c = cat.toLowerCase().trim(); // Toglie spazi e maiuscole
+    // Se scrivi "Scarpe", "scarpa", "Scarpa" o "scarpe", mostrerà i numeri
+    if (c.includes('scarp')) {
+        return this.numeriScarpe;
+    }
+    return this.taglieAbiti;
+},
 
                 mandaOrdine(p) {
-                    if (!p.tagliaScelta) {
-                        alert("Per favore, seleziona una taglia!");
-                        return;
-                    }
-                    const mioNumero = "393715475485"; // <--- CAMBIA CON IL TUO NUMERO
-                    const msg = `Ciao! Vorrei ordinare:\n📦 *${p.nome}*\n📏 Misura: ${p.tagliaScelta}\n💰 Prezzo: €${p.prezzo}`;
-                    window.open(`https://wa.me/${mioNumero}?text=${encodeURIComponent(msg)}`, '_blank');
-                }
+    if (!p.tagliaScelta) {
+        alert("Per favore, seleziona una misura!");
+        return;
+    }
+    const mioNumero = "39XXXXXXXXXX"; // <--- METTI IL TUO NUMERO VERO QUI
+    // Messaggio semplice senza simboli complessi
+    const testo = "Ciao! Vorrei ordinare questo prodotto:\n\n" +
+                  "Prodotto: " + p.nome + "\n" +
+                  "Misura: " + p.tagliaScelta + "\n" +
+                  "Prezzo: Euro " + p.prezzo;
+    
+    const url = "https://wa.me/" + mioNumero + "?text=" + encodeURIComponent(testo);
+    window.open(url, '_blank');
+}
             }
         }
     </script>
 </body>
 </html>
+
