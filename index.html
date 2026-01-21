@@ -50,7 +50,7 @@
         taglieAbiti: ['S', 'M', 'L', 'XL', 'XXL'],
         numeriScarpe: ['35', '36', '37', '38', '39', '40', '41'],
         https://docs.google.com/spreadsheets/d/e/2PACX-1vTjQSVDQ_dhu0su7gfiv8uoJR99o9h_kfYk_fiKZvO4WKPd21paU5QXI_HMCB2U2VB575qQww4CwxYI/pub?output=csv
-        urlFoglio: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTjQSVDQ_dhu0su7gfiv8uoJR99o9h_kfYk_fiKZvO4WKPd21paU5QXI_HMCB2U2VB575qQww4CwxYI/pub?gid=0&single=true&output=csv",
+        urlFoglio: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTjQSVDQ_dhu0su7gfiv8uoJR99o9h_kfYk_fiKZvO4WKPd21paU5QXI_HMCB2U2VB575qQww4CwxYI/pub?gid=0&single=true&output=csv&cachebuster=" + new Date().getTime(),
 
         async init() {
             const response = await fetch(this.urlFoglio);
@@ -59,20 +59,25 @@
         },
 
         parseCSV(csv) {
-            const righe = csv.split("\n").slice(1); // Salta l'intestazione
-            return righe.filter(riga => riga.trim() !== "").map((riga, index) => {
-                const colonne = riga.split(",");
-                return {
-                    id: index,
-                    nome: colonne[1],
-                    categoria: colonne[2],
-                    prezzo: colonne[3],
-                    foto: colonne[4],
-                    descrizione: colonne[5],
-                    tagliaScelta: ''
-                };
-            });
-        },
+    // Divide le righe e toglie quella dell'intestazione
+    const righe = csv.split(/\r?\n/).slice(1); 
+    
+    return righe.filter(riga => riga.trim() !== "").map((riga, index) => {
+        // Questa riga riconosce se il tuo foglio usa , o ;
+        const separatore = riga.includes(";") ? ";" : ",";
+        const colonne = riga.split(separatore);
+        
+        return {
+            id: index,
+            nome: colonne[1] ? colonne[1].trim() : "Senza nome",
+            categoria: colonne[2] ? colonne[2].trim() : "Abbigliamento",
+            prezzo: colonne[3] ? colonne[3].trim() : "0.00",
+            foto: colonne[4] ? colonne[4].trim() : "https://via.placeholder.com/300",
+            descrizione: colonne[5] ? colonne[5].trim() : "",
+            tagliaScelta: ''
+        };
+    });
+}
 
         getOpzioni(cat) {
             return cat.trim().toLowerCase() === 'scarpe' ? this.numeriScarpe : this.taglieAbiti;
@@ -94,3 +99,4 @@
 </body>
 
 </html>
+
