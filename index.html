@@ -3,24 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catalogo Online</title>
+    <title>Catalogo Smart</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-gray-50 font-sans text-gray-900">
 
     <header class="bg-white shadow-sm p-5 sticky top-0 z-50">
-        <h1 class="text-2xl font-black text-center text-indigo-600 uppercase tracking-widest">Mio Store</h1>
+        <h1 class="text-2xl font-black text-center text-indigo-600 uppercase tracking-tighter">Mio Store Online</h1>
     </header>
 
     <main class="max-w-4xl mx-auto p-4" x-data="store()" x-init="init()">
         
         <template x-if="prodotti.length === 0 && !errore">
-            <div class="text-center mt-20 text-gray-400 animate-pulse">Caricamento prodotti...</div>
-        </template>
-
-        <template x-if="errore">
-            <div class="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 mt-10 text-center" x-text="errore"></div>
+            <div class="text-center mt-20 text-gray-400 animate-pulse font-bold">CARICAMENTO...</div>
         </template>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
@@ -28,31 +24,30 @@
                 <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden p-4 flex flex-col">
                     
                     <div class="relative w-full h-80 bg-gray-100 rounded-2xl overflow-hidden mb-4">
-                        <img :src="prodotto.foto" 
-                             class="w-full h-full object-cover" 
-                             @error="$el.src='https://via.placeholder.com/400x500?text=Immagine+Non+Disponibile'">
+                        <img :src="prodotto.foto" class="w-full h-full object-cover" @error="$el.src='https://via.placeholder.com/400x500?text=Immagine+Non+Disponibile'">
                     </div>
                     
-                    <h2 class="text-xl font-bold px-1" x-text="prodotto.nome"></h2>
+                    <h2 class="text-xl font-bold px-1 uppercase" x-text="prodotto.nome"></h2>
                     <p class="text-gray-400 text-sm mb-4 px-1 flex-grow" x-text="prodotto.descrizione"></p>
                     
                     <div class="flex items-center justify-between mb-6 px-1">
                         <span class="text-2xl font-black text-indigo-600" x-text="'€ ' + prodotto.prezzo"></span>
-                        <span class="text-[10px] font-bold uppercase tracking-widest bg-gray-100 px-2 py-1 rounded" x-text="prodotto.categoria"></span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest bg-indigo-50 text-indigo-500 px-2 py-1 rounded-lg" x-text="prodotto.categoria"></span>
                     </div>
 
                     <div class="mb-4">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1 mb-1 block">Taglie Disponibili:</label>
                         <select x-model="prodotto.tagliaScelta" 
-                                class="w-full bg-gray-50 border-none rounded-2xl p-4 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none text-gray-600 font-medium">
+                                class="w-full bg-gray-50 border-2 border-gray-50 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none text-gray-700 font-bold">
                             <option value="">Scegli la misura...</option>
-                            <template x-for="opzione in getOpzioni(prodotto.categoria)" :key="opzione">
+                            <template x-for="opzione in getOpzioni(prodotto)" :key="opzione">
                                 <option :value="opzione" x-text="opzione"></option>
                             </template>
                         </select>
                     </div>
 
                     <button @click="mandaOrdine(prodotto)" 
-                            class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-green-100">
+                            class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold py-4 rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-green-100">
                         Ordina su WhatsApp
                     </button>
                 </div>
@@ -75,38 +70,44 @@
                         const text = await r.text();
                         this.prodotti = this.parseCSV(text);
                     } catch (e) {
-                        this.errore = "Errore di connessione col database.";
+                        this.errore = "Errore di connessione.";
                     }
                 },
 
                 parseCSV(csv) {
-    const righe = csv.split(/\r?\n/).filter(r => r.trim() !== "");
-    return righe.slice(1).map((riga, i) => {
-        const sep = riga.includes(';') ? ';' : ',';
-        const d = riga.split(sep).map(s => s.replace(/"/g, '').trim());
-        
-        return {
-            id: i,
-            nome: d[1] || 'Senza Nome',
-            categoria: d[2] || '',
-            prezzo: d[3] || '0',
-            foto: d[4] || '',
-            descrizione: d[5] || '',
-            // Legge la nuova colonna G (indice 6)
-            giacenza: d[6] ? d[6].split(',').map(t => t.trim()) : null,
-            tagliaScelta: ''
-        };
-    });
-},
+                    const righe = csv.split(/\r?\n/).filter(r => r.trim() !== "");
+                    return righe.slice(1).map((riga, i) => {
+                        const sep = riga.includes(';') ? ';' : ',';
+                        const d = riga.split(sep).map(s => s.replace(/"/g, '').trim());
+                        
+                        return {
+                            id: i,
+                            nome: d[1] || '',
+                            categoria: d[2] || '',
+                            prezzo: d[3] || '0',
+                            foto: d[4] || '',
+                            descrizione: d[5] || '',
+                            // Legge la colonna G (indice 6) e crea una lista
+                            giacenza: d[6] ? d[6].split(',').map(t => t.trim()).filter(t => t !== "") : null,
+                            tagliaScelta: ''
+                        };
+                    });
+                },
 
-                getOpzioni(cat) {
-                    return (cat && cat.toLowerCase().includes('scarp')) ? this.numeriScarpe : this.taglieAbiti;
+                getOpzioni(prodotto) {
+                    // Se la colonna G ha delle taglie, usa solo quelle
+                    if (prodotto.giacenza && prodotto.giacenza.length > 0) {
+                        return prodotto.giacenza;
+                    }
+                    // Altrimenti usa lo standard
+                    const c = prodotto.categoria.toLowerCase();
+                    return c.includes('scarp') ? this.numeriScarpe : this.taglieAbiti;
                 },
 
                 mandaOrdine(p) {
                     if (!p.tagliaScelta) return alert("Seleziona la taglia!");
-                    const tel = "393715475485"; // <--- METTI IL TUO NUMERO QUI
-                    const msg = `Ciao! Vorrei ordinare:\n\n*${p.nome}*\nMisura: ${p.tagliaScelta}\nPrezzo: €${p.prezzo}`;
+                    const tel = "39XXXXXXXXXX"; // <--- METTI IL TUO NUMERO
+                    const msg = `Ciao! Vorrei ordinare:\n\n*${p.nome}*\nTaglia: ${p.tagliaScelta}\nPrezzo: €${p.prezzo}`;
                     window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`);
                 }
             }
@@ -114,4 +115,3 @@
     </script>
 </body>
 </html>
-
