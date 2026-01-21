@@ -19,9 +19,11 @@
     <template x-for="prodotto in prodotti" :key="prodotto.id">
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden p-5 flex flex-col border border-gray-100">
             
-            <img :src="prodotto.foto" 
-                 class="w-full h-72 object-cover rounded-xl mb-4" 
-                 @error="$el.src='https://via.placeholder.com/400x400?text=Foto+In+Arrivo'">
+            <div class="bg-gray-200 p-2 text-[10px] break-all mb-2" x-text="'Link rilevato: ' + prodotto.foto"></div>
+
+<img :src="prodotto.foto" 
+     class="w-full h-72 object-cover rounded-xl mb-4" 
+     @error="$el.src='https://via.placeholder.com/400x400?text=Errore+Link'">
             
             <h2 class="text-xl font-bold mb-1 uppercase text-gray-800" x-text="prodotto.nome"></h2>
             
@@ -126,6 +128,7 @@
     </script>
 </body>
 </html>
+
 
 
 
