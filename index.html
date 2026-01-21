@@ -75,24 +75,34 @@
                 },
 
                 parseCSV(csv) {
-                    const righe = csv.split(/\r?\n/).filter(r => r.trim() !== "");
-                    return righe.slice(1).map((riga, i) => {
-                        const sep = riga.includes(';') ? ';' : ',';
-                        const d = riga.split(sep).map(s => s.replace(/"/g, '').trim());
-                        
-                        return {
-                            id: i,
-                            nome: d[1] || '',
-                            categoria: d[2] || '',
-                            prezzo: d[3] || '0',
-                            foto: d[4] || '',
-                            descrizione: d[5] || '',
-                            // Legge la colonna G (indice 6) e crea una lista
-                            giacenza: d[6] ? d[6].split(',').map(t => t.trim()).filter(t => t !== "") : null,
-                            tagliaScelta: ''
-                        };
-                    });
-                },
+    // Dividiamo il testo in righe
+    const righe = csv.split(/\r?\n/).filter(r => r.trim() !== "");
+    const dati = righe.slice(1);
+
+    return dati.map((riga, index) => {
+        // Questa logica protegge le virgole che stanno tra le virgolette (come "38, 39, 40")
+        const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
+        const d = riga.split(regex).map(s => s.replace(/^"|"$/g, '').trim());
+        
+        // Se d[6] (Colonna G) esiste, puliamo gli spazi
+        let listaGiacenza = null;
+        if (d[6]) {
+            // Dividiamo per virgola e puliamo ogni singolo numero/taglia
+            listaGiacenza = d[6].split(',').map(t => t.trim()).filter(t => t !== "");
+        }
+
+        return {
+            id: index,
+            nome: d[1] || '',
+            categoria: d[2] || '',
+            prezzo: d[3] || '0',
+            foto: d[4] || '',
+            descrizione: d[5] || '',
+            giacenza: listaGiacenza,
+            tagliaScelta: ''
+        };
+    });
+},
 
                 getOpzioni(prodotto) {
                     // Se la colonna G ha delle taglie, usa solo quelle
@@ -115,3 +125,4 @@
     </script>
 </body>
 </html>
+
