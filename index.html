@@ -50,7 +50,7 @@
         taglieAbiti: ['S', 'M', 'L', 'XL', 'XXL'],
         numeriScarpe: ['35', '36', '37', '38', '39', '40', '41'],
         https://docs.google.com/spreadsheets/d/e/2PACX-1vTjQSVDQ_dhu0su7gfiv8uoJR99o9h_kfYk_fiKZvO4WKPd21paU5QXI_HMCB2U2VB575qQww4CwxYI/pub?output=csv
-        urlFoglio: "IL_TUO_LINK_PUBBLICATO_QUI",
+        urlFoglio: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTjQSVDQ_dhu0su7gfiv8uoJR99o9h_kfYk_fiKZvO4WKPd21paU5QXI_HMCB2U2VB575qQww4CwxYI/pub?gid=0&single=true&output=csv",
 
         async init() {
             const response = await fetch(this.urlFoglio);
@@ -83,7 +83,7 @@
                 alert("Per favore, seleziona una taglia o un numero!");
                 return;
             }
-            const mioNumero = "393331234567"; // <--- METTI IL TUO NUMERO VERO QUI
+            const mioNumero = "393715475485"; // <--- METTI IL TUO NUMERO VERO QUI
             const messaggio = `Ciao! Vorrei ordinare: ${p.nome} - Taglia/Num: ${p.tagliaScelta} - Prezzo: €${p.prezzo}`;
             const url = `https://wa.me/${mioNumero}?text=${encodeURIComponent(messaggio)}`;
             window.open(url, '_blank');
@@ -92,4 +92,5 @@
 }
     </script>
 </body>
+
 </html>
