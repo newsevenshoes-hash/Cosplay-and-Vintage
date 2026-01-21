@@ -3,35 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mio Store Online</title>
+    <title>Il Mio Store Online</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100 font-sans text-gray-900">
 
-    <header class="bg-white shadow-sm p-4 mb-6">
-        <h1 class="text-2xl font-bold text-center text-indigo-600">Mio Catalogo WhatsApp</h1>
+    <header class="bg-white shadow-md p-5 sticky top-0 z-50">
+        <h1 class="text-2xl font-extrabold text-center text-indigo-600 tracking-tight">Mio Catalogo WhatsApp</h1>
     </header>
 
     <main class="max-w-4xl mx-auto p-4" x-data="store()" x-init="init()">
         
-        <template x-if="prodotti.length === 0">
-            <p class="text-center text-gray-500">Caricamento prodotti in corso...</p>
+        <template x-if="prodotti.length === 0 && !errore">
+            <div class="flex flex-col items-center justify-center mt-20 text-gray-500 italic text-lg">
+                <p>Caricamento prodotti in corso...</p>
+            </div>
         </template>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <template x-for="prodotto in prodotti" :key="prodotto.id">
-                <div class="bg-white rounded-xl shadow-md overflow-hidden p-4 flex flex-col">
-                    <img :src="prodotto.foto" class="w-full h-64 object-cover rounded-lg mb-4" @error="$el.src='https://via.placeholder.com/300?text=Immagine+non+disponibile'">
-                    
-                    <h2 class="text-xl font-bold" x-text="prodotto.nome"></h2>
-                    <p class="text-gray-600 text-sm mb-2 flex-grow" x-text="prodotto.descrizione"></p>
-                    <p class="text-indigo-600 font-bold text-lg mb-4" x-text="'€ ' + prodotto.prezzo"></p>
+        <template x-if="errore">
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mt-10 rounded shadow" role="alert">
+                <p class="font-bold">Attenzione</p>
+                <p x-text="errore"></p>
+            </div>
+        </template>
 
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1 text-red-500">Scegli Taglia o Numero:</label>
-                        <select x-model="prodotto.tagliaScelta" class="w-full border-gray-300 rounded-md shadow-sm p-2 border bg-gray-50">
-                            <option value="">-- Seleziona --</option>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+            <template x-for="prodotto in prodotti" :key="prodotto.id">
+                <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden p-5 flex flex-col border border-gray-100">
+                    
+                    <img :src="prodotto.foto" 
+                         class="w-full h-72 object-cover rounded-xl mb-4" 
+                         @error="$el.src='https://via.placeholder.com/400x400?text=Foto+In+Arrivo'">
+                    
+                    <h2 class="text-xl font-bold mb-1" x-text="prodotto.nome"></h2>
+                    <p class="text-gray-500 text-sm mb-4 leading-relaxed flex-grow" x-text="prodotto.descrizione"></p>
+                    
+                    <div class="flex items-center justify-between mb-6">
+                        <span class="text-2xl font-black text-indigo-600" x-text="'€ ' + prodotto.prezzo"></span>
+                        <span class="text-xs font-semibold px-2 py-1 bg-gray-100 text-gray-400 rounded uppercase tracking-wider" x-text="prodotto.categoria"></span>
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Seleziona Misura:</label>
+                        <select x-model="prodotto.tagliaScelta" 
+                                class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-indigo-400 focus:border-transparent outline-none transition">
+                            <option value="">Scegli...</option>
                             <template x-for="opzione in getOpzioni(prodotto.categoria)" :key="opzione">
                                 <option :value="opzione" x-text="opzione"></option>
                             </template>
@@ -39,8 +56,8 @@
                     </div>
 
                     <button @click="mandaOrdine(prodotto)" 
-                            class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition">
-                        Ordina su WhatsApp
+                            class="w-full bg-green-500 hover:bg-green-600 active:scale-95 text-white font-bold py-4 rounded-xl shadow-lg shadow-green-200 transition-all flex items-center justify-center gap-2">
+                        <span>Ordina su WhatsApp</span>
                     </button>
                 </div>
             </template>
@@ -51,36 +68,54 @@
         function store() {
             return {
                 prodotti: [],
+                errore: null,
                 taglieAbiti: ['S', 'M', 'L', 'XL', 'XXL'],
                 numeriScarpe: ['35', '36', '37', '38', '39', '40', '41'],
-                // METTI IL TUO LINK CSV TRA LE VIRGOLETTE QUI SOTTO
+                // IL TUO NUOVO LINK
                 urlFoglio: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXtwKX1AgyV_ZuTZIyupvR9Cq1PZs0gj9RbUVr_Z3O77OVxyV30In90xqnkaKJNXyFNZe0bEHd5vwr/pub?output=csv",
 
                 async init() {
                     try {
-                        const response = await fetch(this.urlFoglio);
+                        const response = await fetch(this.urlFoglio + "&cache=" + Date.now());
+                        if (!response.ok) throw new Error("Link non raggiungibile");
                         const text = await response.text();
                         this.prodotti = this.parseCSV(text);
+                        if (this.prodotti.length === 0) this.errore = "Il foglio Google sembra non contenere prodotti.";
                     } catch (e) {
-                        console.error("Errore caricamento:", e);
-                        alert("Errore nel caricamento dei dati dal foglio Google.");
+                        this.errore = "Impossibile caricare i dati. Verifica che il foglio sia 'Pubblicato sul Web' correttamente.";
                     }
                 },
 
-                
+                parseCSV(csv) {
+                    const righe = csv.split(/\r?\n/).filter(r => r.trim() !== "");
+                    const dati = righe.slice(1);
+                    return dati.map((riga, index) => {
+                        const d = riga.split(/[;,]/); // Gestisce sia virgola che punto e virgola
+                        return {
+                            id: index,
+                            nome: d[1] ? d[1].replace(/"/g, '').trim() : 'Prodotto',
+                            categoria: d[2] ? d[2].replace(/"/g, '').trim() : 'Varie',
+                            prezzo: d[3] ? d[3].replace(/"/g, '').trim() : '0',
+                            foto: d[4] ? d[4].replace(/"/g, '').trim() : '',
+                            descrizione: d[5] ? d[5].replace(/"/g, '').trim() : '',
+                            tagliaScelta: ''
+                        };
+                    });
+                },
 
                 getOpzioni(cat) {
                     if(!cat) return this.taglieAbiti;
-                    return cat.toLowerCase().includes('scarpa') ? this.numeriScarpe : this.taglieAbiti;
+                    const c = cat.toLowerCase();
+                    return (c.includes('scarpa') || c.includes('num')) ? this.numeriScarpe : this.taglieAbiti;
                 },
 
                 mandaOrdine(p) {
                     if (!p.tagliaScelta) {
-                        alert("Seleziona una taglia!");
+                        alert("Per favore, seleziona una taglia!");
                         return;
                     }
-                    const mioNumero = "393715475485"; // <--- METTI IL TUO NUMERO VERO QUI
-                    const msg = `Ciao! Vorrei ordinare: ${p.nome}\nTaglia/Num: ${p.tagliaScelta}\nPrezzo: €${p.prezzo}`;
+                    const mioNumero = "393715475485"; // <--- CAMBIA CON IL TUO NUMERO
+                    const msg = `Ciao! Vorrei ordinare:\n📦 *${p.nome}*\n📏 Misura: ${p.tagliaScelta}\n💰 Prezzo: €${p.prezzo}`;
                     window.open(`https://wa.me/${mioNumero}?text=${encodeURIComponent(msg)}`, '_blank');
                 }
             }
@@ -88,10 +123,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
