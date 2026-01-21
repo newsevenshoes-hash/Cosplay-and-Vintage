@@ -3,31 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Il Mio Store Online</title>
+    <title>Mio Store Online</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-gray-100 font-sans">
 
-    <header class="bg-white shadow-sm p-4 sticky top-0 z-10">
-        <h1 class="text-2xl font-bold text-center text-indigo-600">Cosplay and Vintage</h1>
+    <header class="bg-white shadow-sm p-4 mb-6">
+        <h1 class="text-2xl font-bold text-center text-indigo-600">Mio Catalogo WhatsApp</h1>
     </header>
 
-    <main class="max-w-4xl mx-auto p-4" x-data="store()">
+    <main class="max-w-4xl mx-auto p-4" x-data="store()" x-init="init()">
         
+        <template x-if="prodotti.length === 0">
+            <p class="text-center text-gray-500">Caricamento prodotti in corso...</p>
+        </template>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <template x-for="prodotto in prodotti" :key="prodotto.id">
-                <div class="bg-white rounded-xl shadow-md overflow-hidden p-4">
-                    <img :src="prodotto.foto" class="w-full h-64 object-cover rounded-lg mb-4" alt="Prodotto">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden p-4 flex flex-col">
+                    <img :src="prodotto.foto" class="w-full h-64 object-cover rounded-lg mb-4" @error="$el.src='https://via.placeholder.com/300?text=Immagine+non+disponibile'">
                     
                     <h2 class="text-xl font-bold" x-text="prodotto.nome"></h2>
-                    <p class="text-gray-600 text-sm mb-2" x-text="prodotto.descrizione"></p>
+                    <p class="text-gray-600 text-sm mb-2 flex-grow" x-text="prodotto.descrizione"></p>
                     <p class="text-indigo-600 font-bold text-lg mb-4" x-text="'€ ' + prodotto.prezzo"></p>
 
                     <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Seleziona Taglia/Numero:</label>
-                        <select x-model="prodotto.tagliaScelta" class="w-full border-gray-300 rounded-md shadow-sm p-2 border">
-                            <option value="">-- Scegli --</option>
+                        <label class="block text-sm font-medium text-gray-700 mb-1 text-red-500">Scegli Taglia o Numero:</label>
+                        <select x-model="prodotto.tagliaScelta" class="w-full border-gray-300 rounded-md shadow-sm p-2 border bg-gray-50">
+                            <option value="">-- Seleziona --</option>
                             <template x-for="opzione in getOpzioni(prodotto.categoria)" :key="opzione">
                                 <option :value="opzione" x-text="opzione"></option>
                             </template>
@@ -35,7 +39,7 @@
                     </div>
 
                     <button @click="mandaOrdine(prodotto)" 
-                            class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center transition">
+                            class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition">
                         Ordina su WhatsApp
                     </button>
                 </div>
@@ -45,63 +49,60 @@
 
     <script>
         function store() {
-    return {
-        prodotti: [],
-        taglieAbiti: ['S', 'M', 'L', 'XL', 'XXL'],
-        numeriScarpe: ['35', '36', '37', '38', '39', '40', '41'],
-        urlFoglio: "IL_TUO_LINK_CSV_QUI",
+            return {
+                prodotti: [],
+                taglieAbiti: ['S', 'M', 'L', 'XL', 'XXL'],
+                numeriScarpe: ['35', '36', '37', '38', '39', '40', '41'],
+                // METTI IL TUO LINK CSV TRA LE VIRGOLETTE QUI SOTTO
+                urlFoglio: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTjQSVDQ_dhu0su7gfiv8uoJR99o9h_kfYk_fiKZvO4WKPd21paU5QXI_HMCB2U2VB575qQww4CwxYI/pub?gid=0&single=true&output=csv",
 
-        async init() {
-            try {
-                const response = await fetch(this.urlFoglio);
-                const data = await response.text();
-                this.prodotti = this.parseCSV(data);
-                console.log("Prodotti caricati:", this.prodotti);
-            } catch (error) {
-                console.error("Errore nel caricamento:", error);
+                async init() {
+                    try {
+                        const response = await fetch(this.urlFoglio);
+                        const text = await response.text();
+                        this.prodotti = this.parseCSV(text);
+                    } catch (e) {
+                        console.error("Errore caricamento:", e);
+                        alert("Errore nel caricamento dei dati dal foglio Google.");
+                    }
+                },
+
+                parseCSV(csv) {
+                    const righe = csv.split(/\r?\n/).slice(1);
+                    return righe.filter(riga => riga.includes(',')).map((riga, index) => {
+                        // Gestisce sia virgola che punto e virgola
+                        const d = riga.split(/[,;]/);
+                        return {
+                            id: index,
+                            nome: d[1] ? d[1].trim() : '',
+                            categoria: d[2] ? d[2].trim() : '',
+                            prezzo: d[3] ? d[3].trim() : '',
+                            foto: d[4] ? d[4].trim() : '',
+                            descrizione: d[5] ? d[5].trim() : '',
+                            tagliaScelta: ''
+                        };
+                    });
+                },
+
+                getOpzioni(cat) {
+                    if(!cat) return this.taglieAbiti;
+                    return cat.toLowerCase().includes('scarpa') ? this.numeriScarpe : this.taglieAbiti;
+                },
+
+                mandaOrdine(p) {
+                    if (!p.tagliaScelta) {
+                        alert("Seleziona una taglia!");
+                        return;
+                    }
+                    const mioNumero = "393715475485"; // <--- METTI IL TUO NUMERO VERO QUI
+                    const msg = `Ciao! Vorrei ordinare: ${p.nome}\nTaglia/Num: ${p.tagliaScelta}\nPrezzo: €${p.prezzo}`;
+                    window.open(`https://wa.me/${mioNumero}?text=${encodeURIComponent(msg)}`, '_blank');
+                }
             }
-        },
-        
-        parseCSV(csv) {
-    // Divide le righe e toglie quella dell'intestazione
-    const righe = csv.split(/\r?\n/).slice(1); 
-    
-    return righe.filter(riga => riga.trim() !== "").map((riga, index) => {
-        // Questa riga riconosce se il tuo foglio usa , o ;
-        const separatore = riga.includes(";") ? ";" : ",";
-        const colonne = riga.split(separatore);
-        
-        return {
-            id: index,
-            nome: colonne[1] ? colonne[1].trim() : "Senza nome",
-            categoria: colonne[2] ? colonne[2].trim() : "Abbigliamento",
-            prezzo: colonne[3] ? colonne[3].trim() : "0.00",
-            foto: colonne[4] ? colonne[4].trim() : "https://via.placeholder.com/300",
-            descrizione: colonne[5] ? colonne[5].trim() : "",
-            tagliaScelta: ''
-        };
-    });
-}
-
-        getOpzioni(cat) {
-            return cat.trim().toLowerCase() === 'scarpe' ? this.numeriScarpe : this.taglieAbiti;
-        },
-
-        mandaOrdine(p) {
-            if (!p.tagliaScelta) {
-                alert("Per favore, seleziona una taglia o un numero!");
-                return;
-            }
-            const mioNumero = "393715475485"; // <--- METTI IL TUO NUMERO VERO QUI
-            const messaggio = `Ciao! Vorrei ordinare: ${p.nome} - Taglia/Num: ${p.tagliaScelta} - Prezzo: €${p.prezzo}`;
-            const url = `https://wa.me/${mioNumero}?text=${encodeURIComponent(messaggio)}`;
-            window.open(url, '_blank');
         }
-    }
-}
     </script>
 </body>
-
 </html>
+
 
 
