@@ -3,53 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catalogo Smart</title>
+    <title>Cosplay and Vintage - Catalogo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        h1, h2 { font-family: 'Playfair Display', serif; }
+        /* Colore blu scuro del tuo logo per lo sfondo header */
+        .bg-vintage-dark { background-color: #1a2a40; }
+        /* Colore rosa salmone del logo per i dettagli */
+        .text-vintage-pink { color: #e98a9d; }
+        .bg-vintage-pink { background-color: #e98a9d; }
+        /* Colore turchese del logo */
+        .bg-vintage-teal { background-color: #74c3c3; }
+    </style>
 </head>
-<body class="bg-gray-50 font-sans text-gray-900">
+<body class="bg-gray-50 text-gray-800">
 
-    <header class="bg-white shadow-sm p-5 sticky top-0 z-50">
-        <h1 class="text-2xl font-black text-center text-indigo-600 uppercase tracking-tighter">Mio Store Online</h1>
+    <header class="bg-vintage-dark shadow-xl p-6 sticky top-0 z-50 flex flex-col items-center">
+        <img src="IL_LINK_DEL_TUO_LOGO_QUI" alt="Cosplay and Vintage" class="h-24 mb-2 drop-shadow-md">
+        <h1 class="text-white text-xl tracking-widest uppercase opacity-90">Catalogo Online</h1>
     </header>
 
     <main class="max-w-4xl mx-auto p-4" x-data="store()" x-init="init()">
         
         <template x-if="prodotti.length === 0 && !errore">
-            <div class="text-center mt-20 text-gray-400 animate-pulse font-bold">CARICAMENTO...</div>
+            <div class="text-center mt-20 text-vintage-pink animate-pulse font-bold">CARICAMENTO...</div>
         </template>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
             <template x-for="prodotto in prodotti" :key="prodotto.id">
-                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden p-4 flex flex-col">
+                <div class="bg-white rounded-[2rem] shadow-lg overflow-hidden flex flex-col border-b-8 border-vintage-teal">
                     
-                    <div class="relative w-full h-80 bg-gray-100 rounded-2xl overflow-hidden mb-4">
-                        <img :src="prodotto.foto" class="w-full h-full object-cover" @error="$el.src='https://via.placeholder.com/400x500?text=Immagine+Non+Disponibile'">
+                    <div class="relative w-full h-80 bg-gray-100 overflow-hidden">
+                        <img :src="prodotto.foto" class="w-full h-full object-cover transition-transform hover:scale-105 duration-500" @error="$el.src='https://via.placeholder.com/400x500?text=Immagine+In+Arrivo'">
+                        <span class="absolute top-4 right-4 bg-vintage-teal text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter" x-text="prodotto.categoria"></span>
                     </div>
                     
-                    <h2 class="text-xl font-bold px-1 uppercase" x-text="prodotto.nome"></h2>
-                    <p class="text-gray-400 text-sm mb-4 px-1 flex-grow" x-text="prodotto.descrizione"></p>
-                    
-                    <div class="flex items-center justify-between mb-6 px-1">
-                        <span class="text-2xl font-black text-indigo-600" x-text="'€ ' + prodotto.prezzo"></span>
-                        <span class="text-[10px] font-bold uppercase tracking-widest bg-indigo-50 text-indigo-500 px-2 py-1 rounded-lg" x-text="prodotto.categoria"></span>
-                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h2 class="text-2xl font-bold mb-2 text-vintage-dark" x-text="prodotto.nome"></h2>
+                        <p class="text-gray-400 text-sm mb-4 italic flex-grow" x-text="prodotto.descrizione"></p>
+                        
+                        <div class="mb-6">
+                            <span class="text-3xl font-black text-vintage-pink" x-text="'€' + prodotto.prezzo"></span>
+                        </div>
 
-                    <div class="mb-4">
-                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1 mb-1 block">Taglie Disponibili:</label>
-                        <select x-model="prodotto.tagliaScelta" 
-                                class="w-full bg-gray-50 border-2 border-gray-50 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-indigo-500 appearance-none text-gray-700 font-bold">
-                            <option value="">Scegli la misura...</option>
-                            <template x-for="opzione in getOpzioni(prodotto)" :key="opzione">
-                                <option :value="opzione" x-text="opzione"></option>
-                            </template>
-                        </select>
-                    </div>
+                        <div class="mb-5">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Seleziona Misura</label>
+                            <select x-model="prodotto.tagliaScelta" 
+                                    class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 outline-none focus:border-vintage-pink appearance-none text-vintage-dark font-semibold">
+                                <option value="">Scegli...</option>
+                                <template x-for="opzione in getOpzioni(prodotto)" :key="opzione">
+                                    <option :value="opzione" x-text="opzione"></option>
+                                </template>
+                            </select>
+                        </div>
 
-                    <button @click="mandaOrdine(prodotto)" 
-                            class="w-full bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold py-4 rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-green-100">
-                        Ordina su WhatsApp
-                    </button>
+                        <button @click="mandaOrdine(prodotto)" 
+                                class="w-full bg-vintage-pink hover:bg-[#d47a8d] text-white font-bold py-4 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.483 8.413-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.308 1.654zm6.757-4.047c1.519.9 3.588 1.506 5.628 1.507 5.437 0 9.856-4.419 9.859-9.856 0-2.633-1.026-5.11-2.89-6.974s-4.339-2.892-6.97-2.892c-5.439 0-9.856 4.417-9.859 9.858 0 2.047.544 4.047 1.574 5.834l-1.012 3.705 3.868-1.015zm11.233-7.514c-.301-.15-.1.45-.1.45s-.1.25-.1.25-.3.35-.3.35-.25.25-.25.25c-.25.25-.45.35-.45.35-.35.15-.65.25-.65.25-.5.15-.9.15-.9.15-.55 0-1.15-.15-1.15-.15-1.25-.45-2.2-.9-2.2-.9-.85-.45-1.75-1.35-1.75-1.35-1.05-1.25-1.6-2.5-1.6-2.5-.15-.45 0-.85 0-.85.1-.25.3-.55.3-.55.2-.25.3-.4.3-.4.15-.25.1-.45.1-.45-.05-.2-.45-1.1-.45-1.1-.15-.35-.3-.3-.45-.3-.15 0-.3 0-.45 0-.25 0-.6.1-.85.35-.25.25-1 1-1 2.4s1.25 2.75 1.4 2.95c.15.2 2.45 3.75 5.95 5.25.8.35 1.5.55 2 .7.85.25 1.65.2 2.25.1.7-.1 2.1-.85 2.4-1.65.3-.8.3-1.5.2-1.65-.1-.15-.35-.25-.65-.4z"/></svg>
+                            Ordina ora
+                        </button>
+                    </div>
                 </div>
             </template>
         </div>
@@ -69,55 +85,36 @@
                         const r = await fetch(this.urlFoglio + "&t=" + Date.now());
                         const text = await r.text();
                         this.prodotti = this.parseCSV(text);
-                    } catch (e) {
-                        this.errore = "Errore di connessione.";
-                    }
+                    } catch (e) { this.errore = "Errore database."; }
                 },
 
                 parseCSV(csv) {
-    // Dividiamo il testo in righe
-    const righe = csv.split(/\r?\n/).filter(r => r.trim() !== "");
-    const dati = righe.slice(1);
+                    const righe = csv.split(/\r?\n/).filter(r => r.trim() !== "");
+                    return righe.slice(1).map((riga, i) => {
+                        const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
+                        const d = riga.split(regex).map(s => s.replace(/^"|"$/g, '').trim());
+                        return {
+                            id: i,
+                            nome: d[1] || '',
+                            categoria: d[2] || '',
+                            prezzo: d[3] || '0',
+                            foto: d[4] || '',
+                            descrizione: d[5] || '',
+                            giacenza: d[6] ? d[6].split(',').map(t => t.trim()).filter(t => t !== "") : null,
+                            tagliaScelta: ''
+                        };
+                    });
+                },
 
-    return dati.map((riga, index) => {
-        // Questa logica protegge le virgole che stanno tra le virgolette (come "38, 39, 40")
-        const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
-        const d = riga.split(regex).map(s => s.replace(/^"|"$/g, '').trim());
-        
-        // Se d[6] (Colonna G) esiste, puliamo gli spazi
-        let listaGiacenza = null;
-        if (d[6]) {
-            // Dividiamo per virgola e puliamo ogni singolo numero/taglia
-            listaGiacenza = d[6].split(',').map(t => t.trim()).filter(t => t !== "");
-        }
-
-        return {
-            id: index,
-            nome: d[1] || '',
-            categoria: d[2] || '',
-            prezzo: d[3] || '0',
-            foto: d[4] || '',
-            descrizione: d[5] || '',
-            giacenza: listaGiacenza,
-            tagliaScelta: ''
-        };
-    });
-},
-
-                getOpzioni(prodotto) {
-                    // Se la colonna G ha delle taglie, usa solo quelle
-                    if (prodotto.giacenza && prodotto.giacenza.length > 0) {
-                        return prodotto.giacenza;
-                    }
-                    // Altrimenti usa lo standard
-                    const c = prodotto.categoria.toLowerCase();
-                    return c.includes('scarp') ? this.numeriScarpe : this.taglieAbiti;
+                getOpzioni(p) {
+                    if (p.giacenza && p.giacenza.length > 0) return p.giacenza;
+                    return p.categoria.toLowerCase().includes('scarp') ? this.numeriScarpe : this.taglieAbiti;
                 },
 
                 mandaOrdine(p) {
-                    if (!p.tagliaScelta) return alert("Seleziona la taglia!");
-                    const tel = "393715475485"; // <--- METTI IL TUO NUMERO
-                    const msg = `Ciao! Vorrei ordinare:\n\n*${p.nome}*\nTaglia: ${p.tagliaScelta}\nPrezzo: €${p.prezzo}`;
+                    if (!p.tagliaScelta) return alert("Scegli la taglia!");
+                    const tel = "39XXXXXXXXXX"; // <--- METTI IL TUO NUMERO
+                    const msg = `Ciao! Mi sono innamorata di:\n\n*${p.nome}*\nTaglia: ${p.tagliaScelta}\nPrezzo: €${p.prezzo}\n\nÈ ancora disponibile?`;
                     window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`);
                 }
             }
@@ -125,5 +122,3 @@
     </script>
 </body>
 </html>
-
-
