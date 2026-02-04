@@ -18,6 +18,7 @@
         .text-vintage-pink { color: #e98a9d; }
         .bg-vintage-pink { background-color: #e98a9d; }
         .bg-vintage-teal { background-color: #74c3c3; }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800" x-data="store()" x-init="init()">
@@ -25,25 +26,25 @@
     <header class="bg-vintage-dark shadow-xl p-4 sticky top-0 z-50">
         <div class="max-w-4xl mx-auto flex justify-between items-center">
             
-            <div class="flex items-center gap-4">
-    <img src="cosplay_logo.jpeg" alt="Logo" class="h-14 drop-shadow-md">
-    <div class="flex flex-col">
-        <h1 class="text-white text-2xl font-bold tracking-tight leading-none" style="font-family: 'Playfair Display', serif;">
-            Cosplay <span class="text-vintage-pink">&</span> Vintage
-        </h1>
-                    <p class="text-[8px] text-vintage-teal font-bold uppercase">Inventory Management</p>
+            <div class="flex items-center gap-4 cursor-pointer select-none" @click="toggleAdmin()">
+                <img src="cosplay_logo.jpeg" alt="Logo" class="h-14 drop-shadow-md">
+                <div class="flex flex-col">
+                    <h1 class="text-white text-2xl font-bold leading-none" style="font-family: 'Playfair Display', serif;">
+                        Cosplay <span class="text-vintage-pink">&</span> Vintage
+                    </h1>
+                    <p class="text-[9px] text-vintage-teal font-bold uppercase tracking-[0.2em] mt-1">Catalogo Online</p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2" x-show="admin" x-cloak x-transition>
                 <a href="https://imgbb.com/upload" target="_blank" 
-                   class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-xl flex items-center gap-2 transition-transform active:scale-95 shadow-lg">
+                   class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-xl flex items-center gap-2 shadow-lg transition-transform active:scale-95">
                     <span class="text-lg">📸</span>
-                    <span class="text-[10px] font-bold uppercase hidden md:inline">Carica Foto</span>
+                    <span class="text-[10px] font-bold uppercase hidden md:inline font-sans">Carica Foto</span>
                 </a>
 
                 <button @click="window.open('https://docs.google.com/spreadsheets/d/1kt_7aXRlf_GSFIY0-oFN6mc18YMtQDUtNQWObGiJm_Y/edit', '_blank')" 
-                        class="bg-vintage-pink hover:bg-[#d47a8d] p-2 rounded-xl transition-transform active:scale-95 shadow-lg">
+                        class="bg-vintage-pink hover:bg-[#d47a8d] p-2 rounded-xl shadow-lg transition-transform active:scale-95">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
@@ -54,8 +55,12 @@
 
     <main class="max-w-4xl mx-auto p-4">
         
+        <div x-show="admin" x-cloak class="bg-amber-100 border-l-4 border-amber-500 p-2 mb-4 text-amber-700 text-[10px] font-bold uppercase text-center rounded">
+            Modalità Gestione Attiva - I tasti sono ora visibili
+        </div>
+
         <template x-if="prodotti.length === 0 && !errore">
-            <div class="text-center mt-20 text-vintage-pink animate-pulse font-bold text-xl uppercase tracking-widest">Caricamento catalogo...</div>
+            <div class="text-center mt-20 text-vintage-pink animate-pulse font-bold text-xl uppercase tracking-widest">Caricamento...</div>
         </template>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
@@ -76,9 +81,9 @@
                         </div>
 
                         <div class="mb-5">
-                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Seleziona Misura</label>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block font-sans">Seleziona Misura</label>
                             <select x-model="prodotto.tagliaScelta" 
-                                    class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 outline-none focus:border-vintage-pink appearance-none text-vintage-dark font-semibold">
+                                    class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 outline-none focus:border-vintage-pink appearance-none text-vintage-dark font-semibold font-sans">
                                 <option value="">Scegli...</option>
                                 <template x-for="opzione in getOpzioni(prodotto)" :key="opzione">
                                     <option :value="opzione" x-text="opzione"></option>
@@ -87,9 +92,9 @@
                         </div>
 
                         <button @click="mandaOrdine(prodotto)" 
-                                class="w-full bg-vintage-pink hover:bg-[#d47a8d] text-white font-bold py-4 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg">
+                                class="w-full bg-vintage-pink hover:bg-[#d47a8d] text-white font-bold py-4 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg font-sans uppercase text-sm tracking-widest">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.483 8.413-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.308 1.654zm6.757-4.047c1.519.9 3.588 1.506 5.628 1.507 5.437 0 9.856-4.419 9.859-9.856 0-2.633-1.026-5.11-2.89-6.974s-4.339-2.892-6.97-2.892c-5.439 0-9.856 4.417-9.859 9.858 0 2.047.544 4.047 1.574 5.834l-1.012 3.705 3.868-1.015zm11.233-7.514c-.301-.15-.1.45-.1.45s-.1.25-.1.25-.3.35-.3.35-.25.25-.25.25c-.25.25-.45.35-.45.35-.35.15-.65.25-.65.25-.5.15-.9.15-.9.15-.55 0-1.15-.15-1.15-.15-1.25-.45-2.2-.9-2.2-.9-.85-.45-1.75-1.35-1.75-1.35-1.05-1.25-1.6-2.5-1.6-2.5-.15-.45 0-.85 0-.85.1-.25.3-.55.3-.55.2-.25.3-.4.3-.4.15-.25.1-.45.1-.45-.05-.2-.45-1.1-.45-1.1-.15-.35-.3-.3-.45-.3-.15 0-.3 0-.45 0-.25 0-.6.1-.85.35-.25.25-1 1-1 2.4s1.25 2.75 1.4 2.95c.15.2 2.45 3.75 5.95 5.25.8.35 1.5.55 2 .7.85.25 1.65.2 2.25.1.7-.1 2.1-.85 2.4-1.65.3-.8.3-1.5.2-1.65-.1-.15-.35-.25-.65-.4z"/></svg>
-                            Ordina ora
+                            Chiedi disponibilità
                         </button>
                     </div>
                 </div>
@@ -102,6 +107,8 @@
             return {
                 prodotti: [],
                 errore: null,
+                admin: false,
+                clickCount: 0,
                 taglieAbiti: ['S', 'M', 'L', 'XL', 'XXL'],
                 numeriScarpe: ['35', '36', '37', '38', '39', '40', '41'],
                 urlFoglio: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXtwKX1AgyV_ZuTZIyupvR9Cq1PZs0gj9RbUVr_Z3O77OVxyV30In90xqnkaKJNXyFNZe0bEHd5vwr/pub?output=csv",
@@ -112,6 +119,14 @@
                         const text = await r.text();
                         this.prodotti = this.parseCSV(text);
                     } catch (e) { this.errore = "Errore database."; }
+                },
+
+                toggleAdmin() {
+                    this.clickCount++;
+                    if (this.clickCount >= 3) {
+                        this.admin = !this.admin;
+                        this.clickCount = 0; // Reset
+                    }
                 },
 
                 parseCSV(csv) {
@@ -140,7 +155,7 @@
                 mandaOrdine(p) {
                     if (!p.tagliaScelta) return alert("Scegli la taglia!");
                     const tel = "393715475485";
-                    const msg = `Ciao! Mi sono innamorata di:\n\n*${p.nome}*\nTaglia: ${p.tagliaScelta}\nPrezzo: €${p.prezzo}\n\nÈ ancora disponibile?`;
+                    const msg = `Ciao! Ho visto sul catalogo:\n\n*${p.nome}*\nTaglia: ${p.tagliaScelta}\nPrezzo: €${p.prezzo}\n\nÈ ancora disponibile?`;
                     window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`);
                 }
             }
@@ -148,6 +163,7 @@
     </script>
 </body>
 </html>
+
 
 
 
