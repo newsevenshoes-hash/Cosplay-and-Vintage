@@ -2,81 +2,74 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cosplay & Vintage Inventory</title>
-    <link rel="icon" type="image/png" href="FAVICON COSPLAYER.png">
-    <link rel="apple-touch-icon" href="COSPLAY_AND_VINTAGE logo.jpeg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosplay and Vintage - Catalogo</title>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/fVGxY6fq/COSPLAY-AND-VINTAGE-logo.jpg">
+
+<link rel="apple-touch-icon" href="https://i.ibb.co/fVGxY6fq/COSPLAY-AND-VINTAGE-logo.jpg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        h1, h2 { font-family: 'Playfair Display', serif; }
+        /* Colore blu scuro del tuo logo per lo sfondo header */
+        .bg-vintage-dark { background-color: #1a2a40; }
+        /* Colore rosa salmone del logo per i dettagli */
+        .text-vintage-pink { color: #e98a9d; }
+        .bg-vintage-pink { background-color: #e98a9d; }
+        /* Colore turchese del logo */
+        .bg-vintage-teal { background-color: #74c3c3; }
+    </style>
 </head>
-<body class="bg-slate-50 font-sans antialiased text-slate-900" x-data="app()">
+<body class="bg-gray-50 text-gray-800">
 
-    <header class="bg-slate-900 text-white p-4 sticky top-0 z-50 shadow-xl border-b border-slate-800">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <img src="COSPLAY_AND_VINTAGE logo.jpeg" alt="Logo" class="h-10 w-10 object-contain rounded bg-white p-1">
-                <div>
-                    <h1 class="text-xl font-black tracking-tighter uppercase leading-none text-pink-500">Cosplay & Vintage</h1>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Idee e Materiali</p>
-                </div>
-            </div>
-            
-            <div class="flex gap-2">
-                <a href="https://imgbb.com/upload" target="_blank" 
-                   class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-2 rounded-xl flex items-center gap-2 transition-transform active:scale-95 shadow-lg">
-                    <span class="text-lg">📸</span>
-                    <span class="text-[10px] font-black uppercase hidden sm:inline">Carica Foto</span>
-                </a>
-
-                <button @click="window.open('https://docs.google.com/spreadsheets/d/1kt_7aXRlf_GSFIY0-oFN6mc18YMtQDUtNQWObGiJm_Y/edit', '_blank')" 
-                        class="bg-pink-600 hover:bg-pink-700 p-2 rounded-xl transition-transform active:scale-95 shadow-lg">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                </button>
-            </div>
-        </div>
+    <header class="bg-vintage-dark shadow-xl p-6 sticky top-0 z-50 flex flex-col items-center">
+        <img src="https://i.ibb.co/mCP6TzZY/Whats-App-Image-2026-01-21-at-23-45-08.jpg" alt="Cosplay and Vintage" class="h-24 mb-2 drop-shadow-md">
+        <h1 class="text-white text-xl tracking-widest uppercase opacity-90">Catalogo Online</h1>
     </header>
 
-    <main class="max-w-4xl mx-auto p-4">
-        <div class="relative mb-6">
-            <input type="text" x-model="search" placeholder="Cerca nel catalogo vintage..." 
-                   class="w-full bg-white border-2 border-slate-200 p-4 pl-12 rounded-2xl shadow-sm focus:border-pink-500 focus:ring-0 transition-all outline-none">
-            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </div>
-        </div>
+    <main class="max-w-4xl mx-auto p-4" x-data="store()" x-init="init()">
+        
+        <template x-if="prodotti.length === 0 && !errore">
+            <div class="text-center mt-20 text-vintage-pink animate-pulse font-bold">CARICAMENTO...</div>
+        </template>
 
-        <div class="grid gap-4">
-            <template x-for="item in filteredItems()" :key="item.id">
-                <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 flex h-40">
-                    <div class="w-32 h-full bg-slate-200 flex-shrink-0 relative overflow-hidden">
-                        <img :src="item.foto || 'https://via.placeholder.com/300x300?text=No+Photo'" 
-                             class="w-full h-full object-cover">
-                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-2">
-                             <span class="text-[10px] font-bold text-white uppercase" x-text="'#' + item.id"></span>
-                        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+            <template x-for="prodotto in prodotti" :key="prodotto.id">
+                <div class="bg-white rounded-[2rem] shadow-lg overflow-hidden flex flex-col border-b-8 border-vintage-teal">
+                    
+                    <div class="relative w-full h-80 bg-gray-100 overflow-hidden">
+                        <img :src="prodotto.foto" class="w-full h-full object-cover transition-transform hover:scale-105 duration-500" @error="$el.src='https://via.placeholder.com/400x500?text=Immagine+In+Arrivo'">
+                        <span class="absolute top-4 right-4 bg-vintage-teal text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter" x-text="prodotto.categoria"></span>
                     </div>
-
-                    <div class="p-4 flex-grow flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-start">
-                                <h2 class="text-sm font-black text-slate-800 uppercase leading-tight line-clamp-2" x-text="item.descrizione"></h2>
-                                <span class="bg-pink-50 text-pink-700 font-black px-2 py-1 rounded-lg text-xs ml-2" x-text="'€' + item.prezzo"></span>
-                            </div>
+                    
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h2 class="text-2xl font-bold mb-2 text-vintage-dark" x-text="prodotto.nome"></h2>
+                        <p class="text-gray-400 text-sm mb-4 italic flex-grow" x-text="prodotto.descrizione"></p>
+                        
+                        <div class="mb-6">
+                            <span class="text-3xl font-black text-vintage-pink" x-text="'€' + prodotto.prezzo"></span>
                         </div>
 
-                        <div class="flex justify-between items-end">
-                            <a :href="'https://wa.me/39XXXXXXXXXX?text=' + encodeURIComponent('Ciao! Info su Cosplay/Vintage: #' + item.id + ' - ' + item.descrizione)" 
-                               target="_blank"
-                               class="bg-green-500 text-white text-[10px] font-black uppercase px-3 py-2 rounded-lg flex items-center gap-1">
-                                WhatsApp 💬
-                            </a>
-                            <div class="text-right">
-                                <span class="text-[9px] font-bold uppercase text-slate-400 block">Disp.</span>
-                                <span class="text-slate-900 text-base font-black leading-none" x-text="item.pezzi"></span>
-                            </div>
+                        <div class="mb-5">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Seleziona Misura</label>
+                            <select x-model="prodotto.tagliaScelta" 
+                                    class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 outline-none focus:border-vintage-pink appearance-none text-vintage-dark font-semibold">
+                                <option value="">Scegli...</option>
+                                <template x-for="opzione in getOpzioni(prodotto)" :key="opzione">
+                                    <option :value="opzione" x-text="opzione"></option>
+                                </template>
+                            </select>
                         </div>
+
+                        <button @click="mandaOrdine(prodotto)" 
+                                class="w-full bg-vintage-pink hover:bg-[#d47a8d] text-white font-bold py-4 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.483 8.413-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.308 1.654zm6.757-4.047c1.519.9 3.588 1.506 5.628 1.507 5.437 0 9.856-4.419 9.859-9.856 0-2.633-1.026-5.11-2.89-6.974s-4.339-2.892-6.97-2.892c-5.439 0-9.856 4.417-9.859 9.858 0 2.047.544 4.047 1.574 5.834l-1.012 3.705 3.868-1.015zm11.233-7.514c-.301-.15-.1.45-.1.45s-.1.25-.1.25-.3.35-.3.35-.25.25-.25.25c-.25.25-.45.35-.45.35-.35.15-.65.25-.65.25-.5.15-.9.15-.9.15-.55 0-1.15-.15-1.15-.15-1.25-.45-2.2-.9-2.2-.9-.85-.45-1.75-1.35-1.75-1.35-1.05-1.25-1.6-2.5-1.6-2.5-.15-.45 0-.85 0-.85.1-.25.3-.55.3-.55.2-.25.3-.4.3-.4.15-.25.1-.45.1-.45-.05-.2-.45-1.1-.45-1.1-.15-.35-.3-.3-.45-.3-.15 0-.3 0-.45 0-.25 0-.6.1-.85.35-.25.25-1 1-1 2.4s1.25 2.75 1.4 2.95c.15.2 2.45 3.75 5.95 5.25.8.35 1.5.55 2 .7.85.25 1.65.2 2.25.1.7-.1 2.1-.85 2.4-1.65.3-.8.3-1.5.2-1.65-.1-.15-.35-.25-.65-.4z"/></svg>
+                            Ordina ora
+                        </button>
                     </div>
                 </div>
             </template>
@@ -84,42 +77,62 @@
     </main>
 
     <script>
-        function app() {
+        function store() {
             return {
-                search: '',
-                items: [],
-                // URL Pubblicato come CSV (Assicurati che sia pubblicato sul web come CSV)
-                urlCSV: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTE2UbeidDclX6B5qN_Uv819U9r_G7L780fI5o8_pC4C56uW3p5Qv6H-fS99pGq_H6pG_p_q_p_q_p_q/pub?output=csv',
-                
+                prodotti: [],
+                errore: null,
+                taglieAbiti: ['S', 'M', 'L', 'XL', 'XXL'],
+                numeriScarpe: ['35', '36', '37', '38', '39', '40', '41'],
+                urlFoglio: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXtwKX1AgyV_ZuTZIyupvR9Cq1PZs0gj9RbUVr_Z3O77OVxyV30In90xqnkaKJNXyFNZe0bEHd5vwr/pub?output=csv",
+
                 async init() {
                     try {
-                        const response = await fetch(this.urlCSV);
-                        const data = await response.text();
-                        this.items = this.parseCSV(data);
-                    } catch (e) {
-                        console.error("Errore nel caricamento dati");
-                    }
+                        const r = await fetch(this.urlFoglio + "&t=" + Date.now());
+                        const text = await r.text();
+                        this.prodotti = this.parseCSV(text);
+                    } catch (e) { this.errore = "Errore database."; }
                 },
 
                 parseCSV(csv) {
-                    const lines = csv.split('\n').slice(1);
-                    return lines.filter(line => line.trim() !== '').map(line => {
-                        const [id, descrizione, pezzi, prezzo, foto] = line.split(',');
-                        return { id, descrizione, pezzi, prezzo, foto: foto?.trim() };
+                    const righe = csv.split(/\r?\n/).filter(r => r.trim() !== "");
+                    return righe.slice(1).map((riga, i) => {
+                        const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
+                        const d = riga.split(regex).map(s => s.replace(/^"|"$/g, '').trim());
+                        return {
+                            id: i,
+                            nome: d[1] || '',
+                            categoria: d[2] || '',
+                            prezzo: d[3] || '0',
+                            foto: d[4] || '',
+                            descrizione: d[5] || '',
+                            giacenza: d[6] ? d[6].split(',').map(t => t.trim()).filter(t => t !== "") : null,
+                            tagliaScelta: ''
+                        };
                     });
                 },
 
-                filteredItems() {
-                    return this.items.filter(i => 
-                        i.id.toLowerCase().includes(this.search.toLowerCase()) || 
-                        i.descrizione.toLowerCase().includes(this.search.toLowerCase())
-                    );
+                getOpzioni(p) {
+                    if (p.giacenza && p.giacenza.length > 0) return p.giacenza;
+                    return p.categoria.toLowerCase().includes('scarp') ? this.numeriScarpe : this.taglieAbiti;
+                },
+
+                mandaOrdine(p) {
+                    if (!p.tagliaScelta) return alert("Scegli la taglia!");
+                    const tel = "393715475485"; // <--- METTI IL TUO NUMERO
+                    const msg = `Ciao! Mi sono innamorata di:\n\n*${p.nome}*\nTaglia: ${p.tagliaScelta}\nPrezzo: €${p.prezzo}\n\nÈ ancora disponibile?`;
+                    window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`);
                 }
             }
         }
     </script>
 </body>
 </html>
+
+
+
+
+
+
 
 
 
