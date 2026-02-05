@@ -17,7 +17,6 @@
         .bg-vintage-pink { background-color: #e98a9d; }
         .bg-vintage-teal { background-color: #74c3c3; }
         [x-cloak] { display: none !important; }
-        /* Nasconde la scrollbar ma permette lo scroll */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -60,7 +59,7 @@
 
     <main class="max-w-4xl mx-auto p-4">
         
-        <div x-show="admin" x-cloak class="bg-amber-100 border-l-4 border-amber-500 p-2 mb-4 text-amber-700 text-[10px] font-bold uppercase text-center rounded">
+        <div x-show="admin" x-cloak class="bg-amber-100 border-l-4 border-amber-500 p-2 mb-4 text-amber-700 text-[10px] font-bold uppercase text-center rounded tracking-widest">
             Modalità Gestione Attiva
         </div>
 
@@ -71,21 +70,37 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
             <template x-for="prodotto in prodottiFiltrati()" :key="prodotto.id">
-                <div class="bg-white rounded-[2rem] shadow-lg overflow-hidden flex flex-col border-b-8 border-vintage-teal">
+                <div class="bg-white rounded-[2rem] shadow-lg overflow-hidden flex flex-col border-b-8 border-vintage-teal transition-transform duration-300">
+                    
                     <div class="relative w-full h-80 bg-gray-100 overflow-hidden">
-                        <img :src="prodotto.foto" class="w-full h-full object-cover">
-                        <span class="absolute top-4 right-4 bg-vintage-teal text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase" x-text="prodotto.categoria"></span>
+                        <img :src="prodotto.foto" class="w-full h-full object-cover" @error="$el.src='https://via.placeholder.com/400x500?text=Immagine+In+Arrivo'">
+                        <span class="absolute top-4 right-4 bg-vintage-teal text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter" x-text="prodotto.categoria"></span>
                     </div>
                     
                     <div class="p-6 flex flex-col flex-grow">
                         <h2 class="text-2xl font-bold mb-2 text-vintage-dark" x-text="prodotto.nome"></h2>
-                        <p class="text-gray-400 text-sm mb-4 italic flex-grow text-xs leading-relaxed" x-text="prodotto.descrizione"></p>
-                        <div class="flex justify-between items-center">
+                        <p class="text-gray-400 text-sm mb-4 italic flex-grow leading-relaxed" x-text="prodotto.descrizione"></p>
+                        
+                        <div class="mb-6">
                             <span class="text-3xl font-black text-vintage-pink" x-text="'€' + prodotto.prezzo"></span>
-                            <button @click="mandaOrdine(prodotto)" class="bg-vintage-pink text-white p-3 rounded-xl shadow-md active:scale-90 transition-transform">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.483 8.413-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.308 1.654zm6.757-4.047c1.519.9 3.588 1.506 5.628 1.507 5.437 0 9.856-4.419 9.859-9.856 0-2.633-1.026-5.11-2.89-6.974s-4.339-2.892-6.97-2.892c-5.439 0-9.856 4.417-9.859 9.858 0 2.047.544 4.047 1.574 5.834l-1.012 3.705 3.868-1.015z"/></svg>
-                            </button>
                         </div>
+
+                        <div class="mb-5">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block font-sans">Seleziona Misura</label>
+                            <select x-model="prodotto.tagliaScelta" 
+                                    class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl p-3 outline-none focus:border-vintage-pink appearance-none text-vintage-dark font-semibold font-sans">
+                                <option value="">Scegli...</option>
+                                <template x-for="opzione in getOpzioni(prodotto)" :key="opzione">
+                                    <option :value="opzione" x-text="opzione"></option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <button @click="mandaOrdine(prodotto)" 
+                                class="w-full bg-vintage-pink hover:bg-[#d47a8d] text-white font-bold py-4 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg font-sans uppercase text-sm tracking-widest">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.483 8.413-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.308 1.654zm6.757-4.047c1.519.9 3.588 1.506 5.628 1.507 5.437 0 9.856-4.419 9.859-9.856 0-2.633-1.026-5.11-2.89-6.974s-4.339-2.892-6.97-2.892c-5.439 0-9.856 4.417-9.859 9.858 0 2.047.544 4.047 1.574 5.834l-1.012 3.705 3.868-1.015zm11.233-7.514c-.301-.15-.1.45-.1.45s-.1.25-.1.25-.3.35-.3.35-.25.25-.25.25c-.25.25-.45.35-.45.35-.35.15-.65.25-.65.25-.5.15-.9.15-.9.15-.55 0-1.15-.15-1.15-.15-1.25-.45-2.2-.9-2.2-.9-.85-.45-1.75-1.35-1.75-1.35-1.05-1.25-1.6-2.5-1.6-2.5-.15-.45 0-.85 0-.85.1-.25.3-.55.3-.55.2-.25.3-.4.3-.4.15-.25.1-.45.1-.45-.05-.2-.45-1.1-.45-1.1-.15-.35-.3-.3-.45-.3-.15 0-.3 0-.45 0-.25 0-.6.1-.85.35-.25.25-1 1-1 2.4s1.25 2.75 1.4 2.95c.15.2 2.45 3.75 5.95 5.25.8.35 1.5.55 2 .7.85.25 1.65.2 2.25.1.7-.1 2.1-.85 2.4-1.65.3-.8.3-1.5.2-1.65-.1-.15-.35-.25-.65-.4z"/></svg>
+                            Chiedi disponibilità
+                        </button>
                     </div>
                 </div>
             </template>
@@ -100,6 +115,8 @@
                 categoriaSelezionata: 'tutti',
                 admin: false,
                 clickCount: 0,
+                taglieAbiti: ['S', 'M', 'L', 'XL', 'XXL'],
+                numeriScarpe: ['35', '36', '37', '38', '39', '40', '41'],
                 urlFoglio: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXtwKX1AgyV_ZuTZIyupvR9Cq1PZs0gj9RbUVr_Z3O77OVxyV30In90xqnkaKJNXyFNZe0bEHd5vwr/pub?output=csv",
 
                 async init() {
@@ -119,8 +136,14 @@
                         const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
                         const d = riga.split(regex).map(s => s.replace(/^"|"$/g, '').trim());
                         return {
-                            id: i, nome: d[1] || '', categoria: d[2] || 'Vario',
-                            prezzo: d[3] || '0', foto: d[4] || '', descrizione: d[5] || ''
+                            id: i,
+                            nome: d[1] || '',
+                            categoria: d[2] || 'Vario',
+                            prezzo: d[3] || '0',
+                            foto: d[4] || '',
+                            descrizione: d[5] || '',
+                            giacenza: d[6] ? d[6].split(',').map(t => t.trim()).filter(t => t !== "") : null,
+                            tagliaScelta: ''
                         };
                     });
                 },
@@ -128,6 +151,15 @@
                 getCategorie() {
                     const cats = this.prodotti.map(p => p.categoria);
                     return [...new Set(cats)].filter(c => c !== '');
+                },
+
+                getOpzioni(p) {
+                    // Se nel foglio Google hai scritto le taglie separate da virgola nella colonna 7, usa quelle
+                    if (p.giacenza && p.giacenza.length > 0) return p.giacenza;
+                    // Altrimenti usa i predefiniti in base alla categoria
+                    const cat = p.categoria.toLowerCase();
+                    if (cat.includes('scarp') || cat.includes('calzatur')) return this.numeriScarpe;
+                    return this.taglieAbiti;
                 },
 
                 prodottiFiltrati() {
@@ -140,8 +172,9 @@
                 },
 
                 mandaOrdine(p) {
+                    if (!p.tagliaScelta) return alert("Per favore, seleziona una misura!");
                     const tel = "393715475485";
-                    const msg = `Ciao! Info su: *${p.nome}* (Prezzo: €${p.prezzo})`;
+                    const msg = `Ciao! Ho visto sul catalogo:\n\n*${p.nome}*\nTaglia: ${p.tagliaScelta}\nPrezzo: €${p.prezzo}\n\nÈ ancora disponibile?`;
                     window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`);
                 }
             }
